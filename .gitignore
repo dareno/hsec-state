@@ -1,0 +1,4 @@
+__pycache__
+*.log
+hsec-state/comms/*
+hsec-state/hsec-state.cfg
