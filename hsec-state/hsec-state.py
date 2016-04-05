@@ -15,7 +15,7 @@ def main():
 
     # get key for ifttt maker recipe
     config = configparser.ConfigParser()
-    config.read('actor.cfg')
+    config.read('hsec-state.cfg')
     key=config['maker.ifttt.com']['Key']
 
     # create object for communication to sensor system
