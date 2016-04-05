@@ -19,26 +19,36 @@ def main():
     key=config['maker.ifttt.com']['Key']
 
     # create object for communication to sensor system
-    comm_channel = comms.SubChannel("tcp://localhost:5563", ['events','state'])
+    trigger_comms = comms.SubChannel("tcp://localhost:5563", ['events','state'])
+
+    # create object for communication to alert system
+    alert_comms = comms.PubChannel("tcp://*:5564")
+
 
     try:
         while True:
             # Read envelope and address from queue
-            rv = comm_channel.get()
+            rv = trigger_comms.get()
             if rv is not None:
+                # there has been an event
                 [address, contents] = rv
-                print("[%s] %s" % (address, contents))
-                post = "https://maker.ifttt.com/trigger/front_door_opened/with/key/" + key
-                print("not really..." + post)
+                print("Event: [%s] %s" % (address, contents))
+
+                alert_comms.send("state",["Initial state"])
+                #post = "https://maker.ifttt.com/trigger/front_door_opened/with/key/" + key
+                #print("not really..." + post)
                 #print(requests.post(post))
             else:
+                # no events waiting for processing
                 time.sleep(0.1)
-            print("doing stuff")
-            time.sleep(1)
+
+            #print("doing stuff")
+            #time.sleep(1)
             # trigger an event
 
     except KeyboardInterrupt:
-        q.join(timeout=1)
+        pass
+        #q.join(timeout=1) # this probably belongs in the comms module
 
     # clean up zmq connection
     subscriber.close()
