@@ -32,7 +32,7 @@ def main():
             if rv is not None:
                 # there has been an event
                 [address, contents] = rv
-                print("Event: [%s] %s" % (address, contents))
+                print("state event: [%s] %s" % (address, contents))
 
                 alert_comms.send("state",["Initial state"])
                 #post = "https://maker.ifttt.com/trigger/front_door_opened/with/key/" + key
