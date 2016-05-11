@@ -8,6 +8,7 @@ import requests             # for webhooks
 import configparser         # for reading config
 import time
 import comms.comms as comms # for getting a channel to the sensor
+import json                 # transferring data over comms
 
 
 def main():
@@ -44,10 +45,16 @@ def main():
             if rv is not None:
                 # there has been an event
                 [address, contents] = rv
-                print("state event: [%s] %s" % (address, contents))
+                for item in json.loads(contents.decode('utf8')):
+                    if item[0] == 'GPA2':
+                        #print("don't care...state event: [%s] %s" % (address, contents))
+                        #print("don't care... item: %s, %s" % (item[0], item[1]) )
+                        pass
+                    else:
+                        print("care... item: %s, %s" % (item[0], item[1]) )
+                        # should I alert on the event? Check state and alert if armed
+                        alert_comms.send("state",["Initial state"])
 
-                # should I alert on the event? Check state and alert if armed
-                alert_comms.send("state",["Initial state"])
 
             else:
                 # no events waiting for processing
