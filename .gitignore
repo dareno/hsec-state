@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 __pycache__
 *.log
 hsec-state/comms
 hsec-state/comms/*
 hsec-state/hsec-state.cfg
+=======
+
+__pycache__
+>>>>>>> 85d71f2bc74f8475ea7a1a96d9bbb7ae6a6dddb0
