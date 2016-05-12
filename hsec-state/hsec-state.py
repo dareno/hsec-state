@@ -54,7 +54,8 @@ def main():
                 [address, contents] = rv
                 for item in json.loads(contents.decode('utf8')):
                     if is_armed(data, item[0]):
-                        alert_comms.send("state",["Initial state"])
+                        #print("alerting on %s" % item[0])
+                        alert_comms.send("alarm", data["pins"][item[0]][1])
                     else:
                         pass # maybe just log it
 
