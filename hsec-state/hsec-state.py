@@ -8,11 +8,28 @@ import requests             # for webhooks
 import configparser         # for reading config
 import time
 import comms.comms as comms # for getting a channel to the sensor
-import json                 # transferring data over comms
+import json                 # transferring data over comms, format of data model
 
 
+def is_armed(data, pin_id):
+    """
+    Return true if the pin is in an armed zone
+    """
+    for zone in data['zones']:
+        if data['zones'][zone]["armed"] == "True":
+            if pin_id in data['zones'][zone]["members"]:
+                return True
+
+    return False
+    
 def main():
     """ main method """
+
+    # load the wire/sensor model
+    with open('config.json') as json_data_file:
+        data = json.load(json_data_file)
+    #print( json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
+    #print( data['zones'])
 
     # get key for ifttt maker recipe
     config = configparser.ConfigParser()
@@ -25,36 +42,21 @@ def main():
     # create object for communication to alert system
     alert_comms = comms.PubChannel("tcp://*:5564")
 
-
     try:
         while True:
-            # #####################################
-            # check to see if state should change
-            # possible states:
-            #  - unarmed
-            #  - arm for doors
-            #  - arm for doors and 1st floor windows
-            #  - arm for doors and all windows
-            #  - arm for doors, windows and interior motion
 
-
-            # #####################################
-            # process events
             # Read envelope and address from queue
             rv = trigger_comms.get()
+
+            # if there are events, process them
             if rv is not None:
-                # there has been an event
+
                 [address, contents] = rv
                 for item in json.loads(contents.decode('utf8')):
-                    if item[0] == 'GPA2':
-                        #print("don't care...state event: [%s] %s" % (address, contents))
-                        #print("don't care... item: %s, %s" % (item[0], item[1]) )
-                        pass
-                    else:
-                        print("care... item: %s, %s" % (item[0], item[1]) )
-                        # should I alert on the event? Check state and alert if armed
+                    if is_armed(data, item[0]):
                         alert_comms.send("state",["Initial state"])
-
+                    else:
+                        pass # maybe just log it
 
             else:
                 # no events waiting for processing
@@ -64,8 +66,8 @@ def main():
         pass
 
     # clean up zmq connection
-    subscriber.close()
-    context.term()
+    trigger_comms.close()
+    alert_comms.close()
 
 if __name__ == "__main__":
     main()
