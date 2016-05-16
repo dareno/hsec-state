@@ -34,7 +34,7 @@ def main():
     # get key for ifttt maker recipe
     config = configparser.ConfigParser()
     config.read('hsec-state.cfg')
-    key=config['maker.ifttt.com']['Key']
+    #key=config['maker.ifttt.com']['Key']
 
     # create object for communication to sensor system
     trigger_comms = comms.SubChannel("tcp://localhost:5563", ['sensor_events','control_events', 'state'])
