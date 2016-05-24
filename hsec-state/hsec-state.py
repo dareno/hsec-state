@@ -37,7 +37,7 @@ def main():
     #key=config['maker.ifttt.com']['Key']
 
     # create object for communication to sensor system
-    trigger_comms = comms.SubChannel("tcp://localhost:5563", ['sensor_events','control_events', 'state'])
+    trigger_comms = comms.SubChannel("tcp://trig1:5563", ['sensor_events','control_events', 'state'])
 
     # create object for communication to alert system
     alert_comms = comms.PubChannel("tcp://*:5564")
