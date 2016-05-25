@@ -11,6 +11,20 @@ import comms.comms as comms # for getting a channel to the sensor
 import json                 # transferring data over comms, format of data model
 
 
+def arm(data):
+    print("arming..." )
+    for zone in data['zones']:
+        data['zones'][zone]["armed"] = "True"
+
+def disarm(data):
+    print("disarming..." )
+    for zone in data['zones']:
+        data['zones'][zone]["armed"] = "False"
+
+def zone_is_armed(zone):
+    print("checking to see if %s is armed..." % zone)
+    return False
+
 def is_armed(data, pin_id):
     """
     Return true if the pin is in an armed zone
@@ -21,20 +35,23 @@ def is_armed(data, pin_id):
                 return True
 
     return False
-    
+
+def print_arm_status():
+    pass
+
 def main():
     """ main method """
 
     # load the wire/sensor model
     with open('config.json') as json_data_file:
         data = json.load(json_data_file)
+
     #print( json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
     #print( data['zones'])
 
-    # get key for ifttt maker recipe
-    config = configparser.ConfigParser()
-    config.read('hsec-state.cfg')
-    #key=config['maker.ifttt.com']['Key']
+
+    # create object for communication to control system
+    control_comms = comms.SubChannel("tcp://webui1:5563", ['control_events'])
 
     # create object for communication to sensor system
     trigger_comms = comms.SubChannel("tcp://trig1:5563", ['sensor_events','control_events', 'state'])
@@ -46,6 +63,20 @@ def main():
         while True:
 
             # Read envelope and address from queue
+            control_commands = control_comms.get()
+
+            # if there are events, process them
+            if control_commands is not None:
+
+                [address, contents] = control_commands
+                for item in json.loads(contents.decode('utf8')):
+                    print("Received control command %s, item[1]=%s" % (item, item[1]))
+                    if item[1]=="arm":
+                        arm(data)
+                    else:
+                        disarm(data)
+
+            # Read envelope and address from queue
             rv = trigger_comms.get()
 
             # if there are events, process them
@@ -54,7 +85,7 @@ def main():
                 [address, contents] = rv
                 for item in json.loads(contents.decode('utf8')):
                     if is_armed(data, item[0]):
-                        #print("alerting on %s" % item[0])
+                        print("alerting on %s" % item[0])
                         alert_comms.send("alarm", data["pins"][item[0]][1])
                     else:
                         pass # maybe just log it
