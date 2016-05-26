@@ -54,7 +54,7 @@ def main():
     control_comms = comms.SubChannel("tcp://webui1:5563", ['control_events'])
 
     # create object for communication to sensor system
-    trigger_comms = comms.SubChannel("tcp://trig1:5563", ['sensor_events','control_events', 'state'])
+    trigger_comms = comms.SubChannel("tcp://trigger1:5563", ['sensor_events','control_events', 'state'])
 
     # create object for communication to alert system
     alert_comms = comms.PubChannel("tcp://*:5564")
@@ -88,6 +88,7 @@ def main():
                         print("alerting on %s" % item[0])
                         alert_comms.send("alarm", data["pins"][item[0]][1])
                     else:
+                        print("Not alerting on %s" % item[0])
                         pass # maybe just log it
 
             else:
