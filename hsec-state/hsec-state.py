@@ -11,15 +11,17 @@ import comms.comms as comms # for getting a channel to the sensor
 import json                 # transferring data over comms, format of data model
 
 
-def arm(data):
-    print("arming..." )
+def arm(data, zoneToUpdate):
+    print("arming %s" % zoneToUpdate )
     for zone in data['zones']:
-        data['zones'][zone]["armed"] = "True"
+        if zone==zoneToUpdate:
+            data['zones'][zone]["armed"] = "True"
 
-def disarm(data):
-    print("disarming..." )
+def disarm(data, zoneToUpdate):
+    print("disarming %s" % zoneToUpdate )
     for zone in data['zones']:
-        data['zones'][zone]["armed"] = "False"
+        if zone==zoneToUpdate:
+            data['zones'][zone]["armed"] = "False"
 
 def zone_is_armed(zone):
     print("checking to see if %s is armed..." % zone)
@@ -72,9 +74,9 @@ def main():
                 for item in json.loads(contents.decode('utf8')):
                     print("Received control command %s, item[1]=%s" % (item, item[1]))
                     if item[1]=="arm":
-                        arm(data)
+                        arm(data,item[0])
                     else:
-                        disarm(data)
+                        disarm(data,item[0])
 
             # Read envelope and address from queue
             rv = trigger_comms.get()
