@@ -18,10 +18,14 @@ def arm(data, zoneToUpdate):
             data['zones'][zone]["armed"] = "True"
 
 def disarm(data, zoneToUpdate):
-    print("disarming %s" % zoneToUpdate )
+    NotFound = True
     for zone in data['zones']:
         if zone==zoneToUpdate:
+            print("disarming %s" % zoneToUpdate )
             data['zones'][zone]["armed"] = "False"
+            NotFound=False
+    if (NotFound):
+        print("unrecognized zone: %s" % zoneToUpdate )
 
 def zone_is_armed(zone):
     print("checking to see if %s is armed..." % zone)
