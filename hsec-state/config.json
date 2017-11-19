@@ -10,7 +10,7 @@
         "MCP0:GPA7":["enable","Basement Door"]
     },
     "zones":{
-        "Doors":{"armed":"True","members":["MCP0:GPA3","MCP0:GPA4","MCP0:GPA5","MCP0:GPA6","MCP0:GPA7"]},
+        "Doors":{"armed":"False","members":["MCP0:GPA3","MCP0:GPA4","MCP0:GPA5","MCP0:GPA6","MCP0:GPA7"]},
         "Upper Windows":{"armed":"False","members":[]},
         "Lower Windows":{"armed":"False","members":[]},
 	"Inside Motion":{"armed":"False","members":["MCP0:GPA2"]}
