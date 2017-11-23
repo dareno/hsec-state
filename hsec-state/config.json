@@ -1,16 +1,24 @@
 {
     "pins":{
-        "MCP0:GPA0":["disable",""],
-        "MCP0:GPA1":["disable",""],
+        "MCP0:GPA0":["disable","unused MCP0:GPA0"],
+        "MCP0:GPA1":["disable","unused MCP0:GPA1"],
         "MCP0:GPA2":["enable","Family Room PIR"],
         "MCP0:GPA3":["enable","Kitchen Door"],
         "MCP0:GPA4":["enable","Family Room Door"],
-        "MCP0:GPA5":["enable","Laundry Room Door"],
+        "MCP0:GPA5":["disable","unused MCP0:GPA5"],
         "MCP0:GPA6":["enable","Front Door"],
-        "MCP0:GPA7":["enable","Basement Door"]
+        "MCP0:GPA7":["enable","Basement Door"],
+        "MCP0:GPB0":["disable","unused MCP0:GPB0"],
+        "MCP0:GPB1":["disable","unused MCP0:GPB1"],
+        "MCP0:GPB2":["disable","unused MCP0:GPB2"],
+        "MCP0:GPB3":["disable","unused MCP0:GPB3"],
+        "MCP0:GPB4":["disable","unused MCP0:GPB4"],
+        "MCP0:GPB5":["disable","unused MCP0:GPB5"],
+        "MCP0:GPB6":["disable","unused MCP0:GPB6"],
+        "MCP0:GPB7":["disable","unused MCP0:GPB7"]
     },
     "zones":{
-        "Doors":{"armed":"False","members":["MCP0:GPA3","MCP0:GPA4","MCP0:GPA5","MCP0:GPA6","MCP0:GPA7"]},
+        "Doors":{"armed":"False","members":["MCP0:GPA4","MCP0:GPA6","MCP0:GPA7"]},
         "Upper Windows":{"armed":"False","members":[]},
         "Lower Windows":{"armed":"False","members":[]},
 	"Inside Motion":{"armed":"False","members":["MCP0:GPA2"]}
