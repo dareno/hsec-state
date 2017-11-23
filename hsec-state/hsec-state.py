@@ -18,10 +18,14 @@ def arm(data, zoneToUpdate):
             data['zones'][zone]["armed"] = "True"
 
 def disarm(data, zoneToUpdate):
-    print("disarming %s" % zoneToUpdate )
+    NotFound = True
     for zone in data['zones']:
         if zone==zoneToUpdate:
+            print("disarming %s" % zoneToUpdate )
             data['zones'][zone]["armed"] = "False"
+            NotFound=False
+    if (NotFound):
+        print("unrecognized zone: %s" % zoneToUpdate )
 
 def zone_is_armed(zone):
     print("checking to see if %s is armed..." % zone)
@@ -53,13 +57,14 @@ def main():
 
 
     # create object for communication to control system
-    control_comms = comms.SubChannel("tcp://webui1:5563", ['control_events'])
+    #control_comms = comms.SubChannel("tcp://webui1:5563", ['control_events'])
+    control_comms = comms.SubChannel("tcp://node1:5563", ['control_events'])
 
     # create object for communication to sensor system
     trigger_comms = comms.SubChannel("tcp://trigger1:5563", ['sensor_events','control_events', 'state'])
 
-    # create object for communication to alert system
-    alert_comms = comms.PubChannel("tcp://*:5564")
+    # create object for communication to interested parties (e.g. alert)
+    send_comms = comms.PubChannel("tcp://*:5564")
 
     try:
         while True:
@@ -72,11 +77,20 @@ def main():
 
                 [address, contents] = control_commands
                 for item in json.loads(contents.decode('utf8')):
-                    print("Received control command %s, item[1]=%s" % (item, item[1]))
+                    print("contents=%s, Received control command %s, item[0]=%s, item[1]=%s" 
+                            % (contents, item, item[0], item[1])
+                    )
                     if item[1]=="arm":
                         arm(data,item[0])
-                    else:
+                    elif item[1]=="disarm":
                         disarm(data,item[0])
+                    elif item[1]=="status":
+                        # send status
+                        send_comms.send("state", data)
+                    else:
+                        print("Error! Received unknown command %s" % item[1])
+
+            send_comms.send("state", data) # just send some state sometimes...
 
             # Read envelope and address from queue
             rv = trigger_comms.get()
@@ -87,10 +101,12 @@ def main():
                 [address, contents] = rv
                 for item in json.loads(contents.decode('utf8')):
                     if is_armed(data, item[0]):
-                        print("alerting on %s" % item[0])
-                        alert_comms.send("alarm", data["pins"][item[0]][1])
+                        #print("alerting on %s" % item[0])
+                        print("alerting on %s" % data["pins"][item[0]][1])
+                        send_comms.send("alarm", data["pins"][item[0]][1])
                     else:
-                        print("Not alerting on %s" % item[0])
+                        #print("Not alerting on %s" % item[0])
+                        print("Not alerting on %s" % data["pins"][item[0]][1])
                         pass # maybe just log it
 
             else:
@@ -102,7 +118,7 @@ def main():
 
     # clean up zmq connection
     trigger_comms.close()
-    alert_comms.close()
+    send_comms.close()
 
 if __name__ == "__main__":
     main()
